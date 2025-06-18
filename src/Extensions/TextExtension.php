@@ -11,11 +11,6 @@ class TextExtension extends BaseTextExtension
         return 'es_ES';
     }
 
-    /**
-     * Text in format => Paragraphs => Sentences => Words.
-     *
-     * @var string[][]
-     */
     protected array $paragraphs = [
         [
             ['La', 'calidad', 'de', 'los', 'servicios', 'sigue', 'siendo', 'un', 'objetivo', 'central', 'en', 'el', 'sector', 'profesional.'],

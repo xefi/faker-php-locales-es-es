@@ -4,8 +4,8 @@ namespace Unit;
 
 use Random\Randomizer;
 use ReflectionClass;
-use Xefi\Faker\EsEs\Extensions\PersonExtension;
 use Xefi\Faker\EsEs\Tests\Unit\TestCase;
+use Xefi\Faker\Extensions\PersonExtension;
 
 final class PersonExtensionTest extends TestCase
 {
@@ -19,7 +19,7 @@ final class PersonExtensionTest extends TestCase
     {
         parent::setUp();
 
-        $personExtension = new PersonExtension(new Randomizer());
+        $personExtension = new \Xefi\Faker\EsEs\Extensions\PersonExtension(new Randomizer());
         $this->firstNameMale = (new ReflectionClass($personExtension))->getProperty('firstNameMale')->getValue($personExtension);
         $this->firstNameFemale = (new ReflectionClass($personExtension))->getProperty('firstNameFemale')->getValue($personExtension);
         $this->lastName = (new ReflectionClass($personExtension))->getProperty('lastName')->getValue($personExtension);
@@ -181,41 +181,30 @@ final class PersonExtensionTest extends TestCase
         );
     }
 
-    public function testDni(): void
+    public function testDniFormatIsValid(): void
     {
         $dni = $this->faker->dni();
 
-        $this->assertMatchesRegularExpression('/^\d{8}[A-Z]$/', $dni, 'DNI must be 8 digits followed by an uppercase letter.');
+        $this->assertMatchesRegularExpression('/^\d{8}[A-Z]$/', $dni, 'DNI format should be 8 digits followed by an uppercase letter');
+        $this->assertSame($this->getExpectedDniLetter((int) substr($dni, 0, 8)), substr($dni, -1), 'DNI control letter should be valid');
     }
 
-    public function testDniFormatUnformatted(): void
+    public function testNieFormatIsValid(): void
     {
-        $dni = $this->faker->dni(false);
+        $nie = $this->faker->nie();
 
-        $this->assertMatchesRegularExpression('/^\d{8}[A-Z]$/', $dni, 'DNI (unformatted) must be 8 digits followed by an uppercase letter.');
+        $this->assertMatchesRegularExpression('/^[XYZ]\d{7}[A-Z]$/', $nie, 'NIE format should be X/Y/Z + 7 digits + letter');
+
+        $prefix = ['X' => 0, 'Y' => 1, 'Z' => 2][substr($nie, 0, 1)];
+        $number = (int) ($prefix . substr($nie, 1, 7));
+        $expectedLetter = $this->getExpectedDniLetter($number);
+
+        $this->assertSame($expectedLetter, substr($nie, -1), 'NIE control letter should be valid');
     }
 
-    public function testDniFormatFormatted(): void
+    private function getExpectedDniLetter(int $number): string
     {
-        $dni = $this->faker->dni(true);
-
-        $this->assertMatchesRegularExpression('/^\d{2}\.\d{3}\.\d{3}-[A-Z]$/', $dni, 'DNI (formatted) must be in the format 12.345.678-Z.');
-    }
-
-    public function testDniLetterIsCorrect(): void
-    {
-        $dniLetters = 'TRWAGMYFPDXBNJZSQVHLCKE';
-
-        for ($i = 0; $i < 10; $i++) {
-            $dniNumber = random_int(10000000, 99999999);
-            $expectedLetter = $dniLetters[$dniNumber % 23];
-
-            $dni = $dniNumber . $expectedLetter;
-
-            $numberPart = (int) substr($dni, 0, 8);
-            $letterPart = substr($dni, 8, 1);
-
-            $this->assertEquals($expectedLetter, $letterPart, "The DNI letter for number {$numberPart} should be {$expectedLetter}.");
-        }
+        $letters = 'TRWAGMYFPDXBNJZSQVHLCKE';
+        return $letters[$number % 23];
     }
 }

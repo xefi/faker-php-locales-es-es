@@ -35,23 +35,28 @@ class PersonExtension extends BasePersonExtension
     protected $titleMale = ['Sr.', 'Dr.', 'Prof.', 'D.'];
     protected $titleFemale = ['Sra.', 'Srta.', 'Dra.', 'Prof.', 'Dña.'];
 
-    public function dni(bool $formatted = false): string
+    public function dni(): string
     {
-        $dniNumber = $this->randomizer->getInt(10000000, 99999999);
-        $dniLetters = 'TRWAGMYFPDXBNJZSQVHLCKE';
-        $letter = $dniLetters[$dniNumber % 23];
-        $dni = $dniNumber . $letter;
+        $number = $this->randomizer->getInt(10000000, 99999999);
+        $letter = $this->calculateDniLetter($number);
 
-        if ($formatted) {
-            $dni = sprintf(
-                '%s.%s.%s-%s',
-                substr((string) $dniNumber, 0, 2),
-                substr((string) $dniNumber, 2, 3),
-                substr((string) $dniNumber, 5, 3),
-                $letter
-            );
-        }
+        return $number . $letter;
+    }
 
-        return $dni;
+    public function nie(): string
+    {
+        $initialLetter = $this->pickArrayRandomElement(['X', 'Y', 'Z']);
+        $number = $this->randomizer->getInt(1000000, 9999999);
+        $prefix = ['X' => 0, 'Y' => 1, 'Z' => 2][$initialLetter];
+        $fullNumber = (int) ($prefix . str_pad((string) $number, 7, '0', STR_PAD_LEFT));
+        $controlLetter = $this->calculateDniLetter($fullNumber);
+
+        return $initialLetter . $number . $controlLetter;
+    }
+
+    private function calculateDniLetter(int $number): string
+    {
+        $letters = 'TRWAGMYFPDXBNJZSQVHLCKE';
+        return $letters[$number % 23];
     }
 }

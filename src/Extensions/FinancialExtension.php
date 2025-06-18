@@ -6,19 +6,20 @@ use Xefi\Faker\Extensions\FinancialExtension as BaseFinancialExtension;
 
 class FinancialExtension extends BaseFinancialExtension
 {
-    public function getLocale(): string|null
+    public function getLocale(): ?string
     {
         return 'es_ES';
     }
 
-    public function iban(?string $countryCode = null, ?string $format = null): string
+    public function iban(?string $countryCode = 'ES', ?string $format = null): string
     {
-        if ($countryCode === null) {
-            $countryCode = 'ES';
-        }
-
         if ($format === null) {
-            $format = str_repeat('{d}', 20);
+            $format = sprintf(
+                '%s%s%s',
+                str_repeat('{d}', 8),
+                str_repeat('{d}', 2),
+                str_repeat('{d}', 10)
+            );
         }
 
         return parent::iban($countryCode, $format);
