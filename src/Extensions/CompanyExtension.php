@@ -25,49 +25,14 @@ class CompanyExtension extends Extension
         'Soluciones Costa', 'LaForja Metalurgia', 'Aureliano & Co.',
     ];
 
-    public function cif(): string
+    public function nif(): string
     {
-        $letters = 'ABCDEFGHJKLMNPQRSUVW';
-        $prefix = $this->randomizer->getBytesFromString($letters, 1);
-        $number = $this->randomizer->getBytesFromString(implode(range(0, 9)), 7);
+        $prefix = $this->pickArrayRandomElement(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'N', 'P', 'Q', 'R', 'S', 'U', 'V', 'W']);
+        $number = $this->randomizer->getInt(1000000, 9999999);
+        $suffix = $this->pickArrayRandomElement(range('A', 'Z'));
 
-        $sumEven = 0;
-        $sumOdd = 0;
-
-        // Control number
-        for ($i = 0; $i < 7; $i++) {
-            $digit = (int) $number[$i];
-
-            if (($i + 1) % 2 === 0) {
-                $sumEven += $digit;
-            } else {
-                $double = $digit * 2;
-                $sumOdd += $double > 9 ? ($double - 9) : $double;
-            }
-        }
-
-        $total = $sumEven + $sumOdd;
-        $unit = $total % 10;
-        $controlDigit = ($unit === 0) ? 0 : 10 - $unit;
-
-        // Control letter if needed
-        $controlLetters = 'JABCDEFGHI';
-        $letterControl = $controlLetters[$controlDigit];
-
-        // Control letter or control number
-        if (in_array($prefix, ['K', 'P', 'Q', 'S', 'N', 'W'])) {
-            $control = $letterControl; // lettre obligatoire
-        } elseif (in_array($prefix, ['A', 'B', 'E', 'H'])) {
-            $control = (string) $controlDigit;
-        } else {
-            $control = $this->randomizer->getInt(0, 1) === 0
-                ? (string) $controlDigit
-                : $letterControl;
-        }
-
-        return $prefix . $number . $control;
+        return $prefix . $number . strtoupper($suffix);
     }
-
 
     public function company(): string
     {
