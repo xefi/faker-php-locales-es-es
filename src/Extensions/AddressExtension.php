@@ -6,6 +6,11 @@ use Xefi\Faker\Extensions\Extension;
 
 class AddressExtension extends Extension
 {
+    public function getLocale(): string|null
+    {
+        return 'es_ES';
+    }
+    
     protected $provinces = [
         'Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Zaragoza', 'Málaga', 'Murcia', 'Palma', 'Bilbao', 'Alicante',
         'Córdoba', 'Valladolid', 'Vigo', 'Gijón', 'L\'Hospitalet de Llobregat', 'A Coruña', 'Granada', 'Vitoria-Gasteiz',
